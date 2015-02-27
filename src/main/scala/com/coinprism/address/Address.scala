@@ -12,40 +12,13 @@ import spray.json.JsObject
 import spray.json.JsNumber
 import spray.json.JsString
 import spray.json.RootJsonFormat
+import spray.json.JsArray
+import collection.breakOut
+abstract class Address(val value: String)
+case class BitcoinAddress(override val value: String) extends Address(value)
+case class AssetAddress(override val value: String) extends Address(value)
 
-case class Address(value: String)
-case class AssetBalance(id: String, balance: Long, unconfirmed_balance: Long)
-case class AddressBalance(asset_address: String, bitcoin_address: String,
-  issuable_asset: Option[String],
-  balance: Long, unconfirmed_balance: Long, assets: List[AssetBalance])
-
-object AssetBalanceProtocol extends DefaultJsonProtocol {
-  implicit val assetBalanceFormat = jsonFormat3(AssetBalance)
-  implicit object AddressBalanceFormat extends RootJsonFormat[AssetBalance] {
-    override def read(value: JsValue): AssetBalance = {
-
-      val Seq(id, balance, unconfirmed_balance) =
-        value.asJsObject.getFields("id", "balance", "unconfirmed_balance")
-      AssetBalance(id.toString, balance.convertTo[String].toLong, 
-          unconfirmed_balance.convertTo[String].toLong)
-    }
-
-    override def write(assetBalance: AssetBalance): spray.json.JsValue = {
-      val m: Map[String, JsValue] = Map("id" -> JsString(assetBalance.id),
-        "balance" -> JsString(assetBalance.balance.toString),
-        "unconfirmed_balance" -> JsString(assetBalance.unconfirmed_balance.toString))
-      JsObject(m)
-    }
-  }
-
-}
-object AddressBalanceProtocol extends DefaultJsonProtocol {
-  import AssetBalanceProtocol._
-  implicit val addressBalanceFormat = jsonFormat6(AddressBalance)
-  //TODO: parse bitcoin address into the Address case class
-}
-
-object Address {
+object  AddressRequest {
 
   implicit val system = ActorSystem()
   import system.dispatcher // execution context for futures
