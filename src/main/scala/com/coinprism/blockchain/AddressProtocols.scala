@@ -1,4 +1,4 @@
-package com.coinprism.address
+package com.coinprism.blockchain
 
 import spray.json.DefaultJsonProtocol
 import spray.json.JsObject
@@ -71,6 +71,4 @@ object AddressBalanceProtocol extends DefaultJsonProtocol {
       JsObject(m)
     }
   }
-  //implicit val addressBalanceFormat = jsonFormat6(AddressBalance)
-  //TODO: parse bitcoin address into the Address case class
 }
