@@ -8,8 +8,10 @@ import scala.language.postfixOps
 import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
 import scala.concurrent.Future
+import com.coinprism.config.Test
+import com.coinprism.config.Production
 
-class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with BlockchainQuery {
+class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with BlockchainQuery with Production {
 
   val bitcoinAddress = BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt")
   val unusedAddress = BitcoinAddress("1suredbitsx9YWdWuCaCYwad8ZoYayyRYt")
@@ -77,6 +79,18 @@ class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures w
     val response = unspentTXOs(bitcoinAddress)
     whenReady(response, timeout(10 seconds), interval(5 millis)) { txos =>
       txos.size must be(2)
+    }
+  }
+
+  it must "return the address that own an asset" in {
+
+    val ownership = assetOwners(assetId)
+    whenReady(ownership, timeout(2 seconds), interval(5 millis)) { o =>
+      o.asset_id must be(assetId)
+      o.owners.size must be(4)
+      o.owners.head.address must be(BitcoinAddress("1D24qr4gDZ1h5D5hLXF3AbddFWiA4Vnm3d"))
+      o.owners.head.asset_quantity must be(800005)
+      o.owners.head.script must be("76a91483d521f559808be29bcc14dbb9b8763e8bd0230f88ac")
     }
   }
 

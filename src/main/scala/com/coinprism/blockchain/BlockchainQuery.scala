@@ -3,25 +3,23 @@ package com.coinprism.blockchain
 import scala.concurrent.Future
 import spray.http.HttpRequest
 import akka.actor.ActorSystem
-import com.coinprism.config.Constants
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
-import com.coinprism.config.Constants
 import akka.actor.ActorSystem
 import spray.client.pipelining._
 import spray.http._
 import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
 import akka.util.Timeout
+import spray.json.JsValue
+import com.coinprism.config.Environment
 
 abstract class Address(val value: String)
 case class BitcoinAddress(override val value: String) extends Address(value)
 case class AssetAddress(override val value: String) extends Address(value)
 
-trait BlockchainQuery {
-  import Constants._
-  implicit val system = ActorSystem()
-  import system.dispatcher
+trait BlockchainQuery { this: Environment =>
+  import system._
 
   /**
    * returns the balance of an address
@@ -46,7 +44,7 @@ trait BlockchainQuery {
     val pipeline: HttpRequest => Future[List[Transaction]] =
       sendReceive ~> unmarshal[List[Transaction]]
 
-    pipeline(Get(host + Constants.version + addresses + address.value + "/transactions?format=json"))
+    pipeline(Get(host + version + addresses + address.value + "/transactions?format=json"))
   }
   /**
    * Finds all the unspent transaction outputs of an address
@@ -83,4 +81,25 @@ trait BlockchainQuery {
     pipeline(Get(host + version + assets + assetId))
   }
 
+  /**
+   * Returns all the addresses holding an asset, and the number of units held
+   * @param assetId - the asset to find up in the blockchain
+   * @return owners - the ownsers of the asset and the number of units held
+   */
+  def assetOwners(assetId: String, blockHeight: Option[Long] = None) = {
+    import AssetOwnershipProtocol._
+    val pipeline: HttpRequest => Future[AssetOwnership] = sendReceive ~> unmarshal[AssetOwnership]
+    blockHeight match {
+      case Some(n) => pipeline(Get(host + version + assets + assetId + "/owners?block=" + blockHeight.toString))
+      case None => pipeline(Get(host + version + assets + assetId + "/owners"))
+    }
+  }
+
+  /**
+   * Query asset information for transactions that are not in the Blockchain yet. The transactions may reference each other,
+   * or reference other transactions already in the Blockchain.
+   * @param json - the raw transaction in json to analyze
+   * @return
+   */
+  def analyzeRawTransactions(json: JsValue) = ???
 }
