@@ -7,6 +7,7 @@ import scala.concurrent.Await
 import scala.language.postfixOps
 import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
+import scala.concurrent.Future
 
 class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with BlockchainQuery {
 
@@ -14,50 +15,80 @@ class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures w
   val unusedAddress = BitcoinAddress("1suredbitsx9YWdWuCaCYwad8ZoYayyRYt")
   val testBitcoinAddress = BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt")
   val testAssetAddress = AssetAddress("akMVNmYwN8bqqQknswpgPCoVCUAyiXyDxvG")
+  val assetId = "AS6tDJJ3oWrcE1Kk3T14mD8q6ycHYVzyYQ"
   "BlockchainQuery" must "get the correct bitcoin address from coinprism" in {
     val addressBalanceFromCoinprism =
-      getAddress(BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt"))
+      addressBalance(BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt"))
     whenReady(addressBalanceFromCoinprism, timeout(5 seconds), interval(5 millis)) { a =>
       a.bitcoin_address must be(testBitcoinAddress)
     }
   }
 
   it must "get the correct asset address from coinprism" in {
-    val addressBalanceFromCoinprism = getAddress(testAssetAddress)
+    val addressBalanceFromCoinprism = addressBalance(testAssetAddress)
     whenReady(addressBalanceFromCoinprism, timeout(2 seconds), interval(5 millis)) { a =>
       a.asset_address must be(testAssetAddress)
     }
   }
 
   it must "tell if the current address is an issuable asset" in {
-    val addressBalanceFromCoinprism = getAddress(testAssetAddress)
+    val addressBalanceFromCoinprism = addressBalance(testAssetAddress)
     whenReady(addressBalanceFromCoinprism, timeout(2 seconds), interval(5 millis)) { a =>
       a.issuable_asset must be(Some("AcuREPQJemxHwqVZzbsutcVVqPr4HwjXBa"))
     }
   }
 
   it must "tell if there is a balance available at this address" in {
-    val addressBalanceFromCoinprism = getAddress(testAssetAddress)
+    val addressBalanceFromCoinprism = addressBalance(testAssetAddress)
     whenReady(addressBalanceFromCoinprism, timeout(2 seconds), interval(5 millis)) { a =>
       a.balance must be(0)
     }
   }
 
   it must "tell if there is an unconfirmed balance at this address" in {
-    val addressBalanceFromCoinprism = getAddress(testAssetAddress)
+    val addressBalanceFromCoinprism = addressBalance(testAssetAddress)
     whenReady(addressBalanceFromCoinprism, timeout(2 seconds), interval(5 millis)) { a =>
       a.balance must be(0)
     }
   }
+
+  it must "return the recent transactions for a given address" in {
+    val transactions: Future[List[Transaction]] = recentTransactions(bitcoinAddress)
+    whenReady(transactions, timeout(2 seconds), interval(5 millis)) { txs =>
+      txs.size must be(2)
+    }
+  }
+
+  it must "return the correct amount of inputs for a transaction given an address" in {
+    val transactions: Future[List[Transaction]] = recentTransactions(bitcoinAddress)
+    whenReady(transactions, timeout(2 seconds), interval(5 millis)) { txs =>
+      txs.head.inputs.size must be(2)
+
+    }
+  }
+
+  it must "return the correct amount of outputs for a transaction given an address" in {
+    val transactions: Future[List[Transaction]] = recentTransactions(bitcoinAddress)
+    whenReady(transactions, timeout(2 seconds), interval(5 millis)) { txs =>
+      txs.head.outputs.size must be(4)
+    }
+  }
   it must "return the correct amount of unspent txos" in {
-    val response = getUnspentTXOs(bitcoinAddress)
+    val response = unspentTXOs(bitcoinAddress)
     whenReady(response, timeout(10 seconds), interval(5 millis)) { txos =>
       txos.size must be(2)
     }
   }
 
+  it must "the same asset id from coinprism given an asset id" in {
+    val assetMetaInfo = assetDefinition(assetId)
+    whenReady(assetMetaInfo, timeout(2 seconds), interval(5 millis)) { a =>
+      a.asset_id must be(assetId)
+    }
+  }
+
   it must "return an error for an invalid address" in {
-    val response = getUnspentTXOs(unusedAddress)
+    val response = unspentTXOs(unusedAddress)
     evaluating {
       Await.result(response, 2 seconds)
     } must produce[UnsuccessfulResponseException]
