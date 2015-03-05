@@ -17,8 +17,6 @@ object InputProtocol extends DefaultJsonProtocol {
   import BitcoinAddressProtocol._
   implicit object InputFormat extends RootJsonFormat[Input] {
     override def read(jsValue: JsValue): Input = {
-
-      println("Reading input")
       val obj = jsValue.asJsObject
       val Seq(output_hash, output_index, value, addresses,
         script_signature, asset_id, asset_quantity) =

@@ -18,9 +18,7 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
   "Transaction Builder" must "issue colored coins" in {
     val coloredCoinIssuance = ColorCoinIssuance(1000, BitcoinAddress("1zLkEoZF7Zdoso57h9si5fKxrKopnGSDn"),
       AssetAddress("akSjSW57xhGp86K6JFXXroACfRCw7SPv637"), 500, "u=https://site.com/assetdef")
-
     val unsignedTransaction = issueColoredCoins(coloredCoinIssuance)
-
     whenReady(unsignedTransaction, timeout(2 seconds), interval(5 millis)) { txs =>
       txs.inputs.size must be(1)
       txs.outputs.size must be(3)
