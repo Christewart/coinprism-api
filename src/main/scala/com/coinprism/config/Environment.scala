@@ -9,6 +9,8 @@ trait Environment {
   def transactions = "transactions/"
   def assets = "assets/"
   def issueAsset = "issueasset"
+  def sendAsset : String = "sendasset"
+  def sendBitcoin = "sendbitcoin"
   def version = v1
 
   implicit val system = ActorSystem("Coinprism-Api-Actor-System")

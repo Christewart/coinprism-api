@@ -29,7 +29,10 @@ trait BlockchainQuery { this: Environment =>
   def addressBalance(address: Address): Future[AddressBalance] = {
     import AssetBalanceProtocol._
     import AddressBalanceProtocol._
-    val pipeline: HttpRequest => Future[AddressBalance] = sendReceive ~> unmarshal[AddressBalance]
+    val pipeline: HttpRequest => Future[AddressBalance] =
+      addHeader("Authorization",
+        "2179cc484e71fcaf682bbe3a95364210c02495b57940949dcb83df26306d0ebb") ~>
+      sendReceive ~> unmarshal[AddressBalance]
     pipeline(Get(host + version + addresses + address.value))
   }
 

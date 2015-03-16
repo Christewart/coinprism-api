@@ -10,11 +10,9 @@ import spray.http._
 import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
 import scala.concurrent.Future
-import com.coinprism.blockchain.BitcoinAddressProtocol
-import com.coinprism.blockchain.Address
 import com.coinprism.blockchain.AddressProtocol
-
-
+import spray.json._
+import DefaultJsonProtocol._
 trait TransactionBuilder { this: Environment =>
   import system._
 
@@ -23,7 +21,7 @@ trait TransactionBuilder { this: Environment =>
    * The destination ('address' parameter) must be an asset enabled address.
    * @param unsigned transaction - the unsigned transaction
    */
-  def issueColoredCoins(issuance: ColorCoinIssuance): Future[UnsignedTransaction] = {
+  def createUnsignedTxForColoredCoins(issuance: ColorCoinIssuance): Future[UnsignedTransaction] = {
     import ColorCoinIssuanceProtocol._
     import UnsignedTransactionProtocol._
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
@@ -32,16 +30,28 @@ trait TransactionBuilder { this: Environment =>
   }
 
   /**
-   * Creates an unsigned transaction for sending an asset from a bitcoin address. 
+   * Creates an unsigned transaction for sending an asset from a bitcoin address.
    * The destination ('address' parameter) must be an asset enabled address.
-   * @param 
+   * @param asset transaction - the asset transaction to be sent to coinprism
    */
-  def sendAsset(assetTransaction: NewTransaction) = {
+  def createUnsignedTxForAsset(assetTransaction: NewAssetTransaction): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
-    import AddressProtocol._
-    import NewTransactionProtocol._
+    import NewAssetTransactionProtocol._
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post(host + version + issueAsset + "?format=json", assetTransaction))
+    pipeline(Post(host + version + sendAsset + "?format=json", assetTransaction))
+  }
+
+  /**
+   * Creates an unsigned transaction for sending Bitcoin from an address.
+   * @param bitcoinTransaction - the bitcoin transaction to be sent to coinprism
+   * @return unsignedTransaction - the unsignedTransaction coinprism created
+   */
+  def createUnsignedTxForBitcoin(bitcoinTransaction: NewBitcoinTransaction): Future[UnsignedTransaction] = {
+    import UnsignedTransactionProtocol._
+    import NewBitcoinTransactionProtocol._
+    println(bitcoinTransaction.toJson)
+    val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
+    pipeline(Post(host + version + sendBitcoin + "?format=json", bitcoinTransaction))
   }
 }
 

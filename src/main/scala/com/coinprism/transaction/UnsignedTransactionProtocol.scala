@@ -11,4 +11,5 @@ object UnsignedTransactionProtocol extends DefaultJsonProtocol {
   import InputProtocol._
 
   implicit val unsignedTransactionFormat = jsonFormat4(UnsignedTransaction.apply)
+
 }

@@ -1,6 +1,6 @@
 package com.coinprism.transaction
 
-import spray.json.DefaultJsonProtocol
+import spray.json._
 import com.coinprism.blockchain.BitcoinAddress
 import com.coinprism.blockchain.BitcoinAddressProtocol
 import com.coinprism.blockchain.AssetAddress
@@ -11,5 +11,29 @@ object ColorCoinIssuanceProtocol extends DefaultJsonProtocol {
 
   import BitcoinAddressProtocol._
   import AssetAddressProtocol._
-  implicit val colorCoinIssuanceFormat = jsonFormat5(ColorCoinIssuance.apply)
+  implicit object ColorCoinIssuanceFormat extends RootJsonFormat[ColorCoinIssuance] {
+
+    override def read(jsValue : JsValue) = {
+      val obj = jsValue.asJsObject
+      val Seq(fees,from,address,amount,metadata) = obj.getFields("fees","from",
+        "address", "amount", "metadata")
+      ColorCoinIssuance(fees.convertTo[Long],
+        BitcoinAddress(from.convertTo[String]), AssetAddress(address.convertTo[String]),
+        amount.convertTo[Long], metadata.convertTo[String])
+    }
+
+    override def write(issuance : ColorCoinIssuance) = {
+
+      val fees = JsNumber(issuance.fees)
+      val from = JsString(issuance.from.value)
+      val address = JsString(issuance.address.value)
+      val amount = JsNumber(issuance.amount)
+      val metadata = JsString(issuance.metadata)
+
+      val m : Map[String,JsValue] = Map ("fees" -> fees, "from"-> from,
+        "address" -> address, "amount" -> amount, "metadata" -> metadata)
+      JsObject(m)
+
+    }
+  }
 }
