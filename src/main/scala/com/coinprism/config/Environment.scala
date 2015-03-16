@@ -11,6 +11,7 @@ trait Environment {
   def issueAsset = "issueasset"
   def sendAsset : String = "sendasset"
   def sendBitcoin = "sendbitcoin"
+  def bitcoinAssetSwap = "bitcoinassetswap"
   def version = v1
 
   implicit val system = ActorSystem("Coinprism-Api-Actor-System")

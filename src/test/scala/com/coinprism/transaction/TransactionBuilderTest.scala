@@ -56,5 +56,20 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
 
     }
   }
+
+  it must "atomically swap and bitcoins for an asset" in {
+
+    val swp = SwapBitcoinsAndAsset(AssetAddress("anaypepNg9qwGbfekFdqEVohqupLhPkKA5Y"),
+      1500000, AssetAddress("akBxDzQctibTKg7xSAKG4MwZuJTVys7dK7E"),
+      "AHthB6AQHaSS9VffkfMqTKTxVV43Dgst36", 5, 15000)
+    val unsignedTx = atomicallySwapBitcoinsAndAsset(swp)
+    whenReady(unsignedTx, timeout(2 seconds), interval(5 millis)) { txs =>
+      txs.inputs.size must be (2)
+      txs.outputs.size must be (5)
+
+      txs.amount must be ("4989985600".toLong)
+      txs.fees must be (15000)
+    }
+  }
 }
 

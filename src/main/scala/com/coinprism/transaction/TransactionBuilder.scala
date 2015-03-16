@@ -49,14 +49,21 @@ trait TransactionBuilder { this: Environment =>
   def createUnsignedTxForBitcoin(bitcoinTransaction: NewBitcoinTransaction): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import NewBitcoinTransactionProtocol._
-    println(bitcoinTransaction.toJson)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
     pipeline(Post(host + version + sendBitcoin + "?format=json", bitcoinTransaction))
   }
+
+  /**
+   * Creates an unsigned transaction that atomically swaps
+   * the given amount of Bitcoins coming from one address with
+   * the given amount of an asset coming from another address.
+   * @return UnsignedTransaction reprsenting the swap
+   */
+  def atomicallySwapBitcoinsAndAsset( swp : SwapBitcoinsAndAsset) : Future[UnsignedTransaction] = {
+    import UnsignedTransactionProtocol._
+    import SwapBitcoinsAndAssetProtocol._
+    println(swp.toJson)
+    val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
+    pipeline(Post(host + version + bitcoinAssetSwap + "?format=json", swp))
+  }
 }
-
-
-/*"""{  'fees': 1000,  'from': '1zLkEoZF7Zdoso57h9si5fKxrKopnGSDn',  
-'to': [    {      'address': 'akSjSW57xhGp86K6JFXXroACfRCw7SPv637',      
-  'amount': '10',      
-'asset_id': 'AHthB6AQHaSS9VffkfMqTKTxVV43Dgst36'    }  ]}"""*/
