@@ -12,10 +12,10 @@ trait Environment {
   def sendAsset : String = "sendasset"
   def sendBitcoin = "sendbitcoin"
   def bitcoinAssetSwap = "bitcoinassetswap"
+  def signTransaction = "signtransaction"
   def version = v1
 
   implicit val system = ActorSystem("Coinprism-Api-Actor-System")
-  import system.dispatcher
 }
 
 trait Production extends Environment {

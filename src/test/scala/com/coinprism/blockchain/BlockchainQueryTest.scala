@@ -11,7 +11,7 @@ import scala.concurrent.Future
 import com.coinprism.config.Test
 import com.coinprism.config.Production
 
-class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with BlockchainQuery with Production {
+class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with CoinprismBlockchainQuery with Production {
 
   val bitcoinAddress = BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt")
   val unusedAddress = BitcoinAddress("1suredbitsx9YWdWuCaCYwad8ZoYayyRYt")

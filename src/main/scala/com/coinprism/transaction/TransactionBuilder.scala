@@ -1,19 +1,13 @@
 package com.coinprism.transaction
 
 import com.coinprism.config.Environment
-import com.coinprism.blockchain.BitcoinAddress
-import spray.json._
-import DefaultJsonProtocol._
-import spray.http.HttpRequest
+
 import spray.client.pipelining._
-import spray.http._
 import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
 import scala.concurrent.Future
-import com.coinprism.blockchain.AddressProtocol
 import spray.json._
-import DefaultJsonProtocol._
-trait TransactionBuilder { this: Environment =>
+trait CoinprismTransactionBuilder { this: Environment =>
   import system._
 
   /**
@@ -62,8 +56,21 @@ trait TransactionBuilder { this: Environment =>
   def atomicallySwapBitcoinsAndAsset( swp : SwapBitcoinsAndAsset) : Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import SwapBitcoinsAndAssetProtocol._
-    println(swp.toJson)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
     pipeline(Post(host + version + bitcoinAssetSwap + "?format=json", swp))
+  }
+
+  /**
+   * Signs an unsigned transaction given its raw hex representation and the
+   * private keys for addresses in input. Keys must be sent in hex form.
+   * @param unsignedTxWithPrivateKey
+   * @return the raw transaction
+   */
+  def signTransaction(unsignedTxWithPrivateKey : UnsignedTxHexWithPrivateKey) : Future[RawTransaction] = {
+    import UnsignedTxHexWithPrivateKeyProtocol._
+    import RawTransactionProtocol._
+    println(unsignedTxWithPrivateKey.toJson)
+    val pipeline: HttpRequest => Future[RawTransaction] = sendReceive ~> unmarshal[RawTransaction]
+    pipeline(Post(host + version + signTransaction,unsignedTxWithPrivateKey))
   }
 }

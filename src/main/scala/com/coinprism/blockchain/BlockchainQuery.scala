@@ -1,16 +1,11 @@
 package com.coinprism.blockchain
 
+
 import scala.concurrent.Future
-import spray.http.HttpRequest
-import akka.actor.ActorSystem
-import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
-import akka.actor.ActorSystem
 import spray.client.pipelining._
-import spray.http._
 import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
-import akka.util.Timeout
+
 import spray.json.JsValue
 import com.coinprism.config.Environment
 
@@ -18,7 +13,7 @@ abstract class Address(val value: String)
 case class BitcoinAddress(override val value: String) extends Address(value)
 case class AssetAddress(override val value: String) extends Address(value)
 
-trait BlockchainQuery { this: Environment =>
+trait CoinprismBlockchainQuery { this: Environment =>
   import system._
 
   /**

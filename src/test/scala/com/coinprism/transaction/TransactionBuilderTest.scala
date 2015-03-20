@@ -11,7 +11,7 @@ import scala.language.postfixOps
 //case class ColorCoinIssuance(fees: Long, from: BitcoinAddress, address: BitcoinAddress,
 // amount: Long, metadata: String)
 class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFutures
-  with TransactionBuilder with Production {
+  with CoinprismTransactionBuilder with Production {
 
   "Transaction Builder" must "issue colored coins" in {
     val coloredCoinIssuance = ColorCoinIssuance(1000, BitcoinAddress("1zLkEoZF7Zdoso57h9si5fKxrKopnGSDn"),
@@ -57,7 +57,7 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
     }
   }
 
-  it must "atomically swap and bitcoins for an asset" in {
+  it must "atomically swap bitcoins for an asset" in {
 
     val swp = SwapBitcoinsAndAsset(AssetAddress("anaypepNg9qwGbfekFdqEVohqupLhPkKA5Y"),
       1500000, AssetAddress("akBxDzQctibTKg7xSAKG4MwZuJTVys7dK7E"),
@@ -71,5 +71,6 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
       txs.fees must be (15000)
     }
   }
+
 }
 
