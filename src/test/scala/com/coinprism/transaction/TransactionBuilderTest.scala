@@ -2,7 +2,7 @@ package com.coinprism.transaction
 
 import com.coinprism.blockchain.{AssetAddress, BitcoinAddress}
 import com.coinprism.config.CoinprismProduction
-import com.coinprism.config.Formats.Json
+import com.coinprism.config.Formats.{ Json , Raw}
 import org.scalatest.{FlatSpec, MustMatchers}
 import org.scalatest.concurrent.ScalaFutures
 
@@ -20,10 +20,22 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
     val unsignedTransaction = createUnsignedTxForColoredCoins(coloredCoinIssuance)(Json)
 
     whenReady(unsignedTransaction, timeout(3 seconds), interval(5 millis)) { txs =>
-      txs.inputs.size must be(1)
-      txs.outputs.size must be(3)
-      txs.amount must be (140756317)
-      txs.fees must be (1000)
+      txs.inputs.get.size must be(1)
+      txs.outputs.get.size must be(3)
+      txs.amount.get must be (140756317)
+      txs.fees.get must be (1000)
+
+    }
+  }
+
+  it must "issue colored coins and return a raw unsigned tx" in {
+    val coloredCoinIssuance = ColorCoinIssuance(1000, BitcoinAddress("1zLkEoZF7Zdoso57h9si5fKxrKopnGSDn"),
+      AssetAddress("akSjSW57xhGp86K6JFXXroACfRCw7SPv637"), 500, "u=https://site.com/assetdef")
+    val unsignedTransaction = createUnsignedTxForColoredCoins(coloredCoinIssuance)(Raw)
+
+    whenReady(unsignedTransaction, timeout(2 seconds), interval(5 millis)) { uTx =>
+      println(uTx.raw.get)
+      uTx.raw.isDefined must be (true)
 
     }
   }
@@ -37,8 +49,8 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
 
     whenReady(unsignedTx, timeout(3 seconds), interval(5 millis)) { tx =>
 
-      tx.inputs.size must be(2)
-      tx.outputs.size must be(4)
+      tx.inputs.get.size must be(2)
+      tx.outputs.get.size must be(4)
     }
 
   }
@@ -52,8 +64,8 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
 
     whenReady(unsignedTx, timeout(2 seconds), interval(5 millis)) { tx =>
 
-      tx.inputs.size must be(1)
-      tx.outputs.size must be(2)
+      tx.inputs.get.size must be(1)
+      tx.outputs.get.size must be(2)
 
     }
   }
@@ -65,11 +77,11 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
       "AHthB6AQHaSS9VffkfMqTKTxVV43Dgst36", 5, 15000)
     val unsignedTx = atomicallySwapBitcoinsAndAsset(swp)(Json)
     whenReady(unsignedTx, timeout(2 seconds), interval(5 millis)) { txs =>
-      txs.inputs.size must be (2)
-      txs.outputs.size must be (5)
+      txs.inputs.get.size must be (2)
+      txs.outputs.get.size must be (5)
 
-      txs.amount must be ("4989985600".toLong)
-      txs.fees must be (15000)
+      txs.amount.get must be ("4989985600".toLong)
+      txs.fees.get must be (15000)
     }
   }
 
