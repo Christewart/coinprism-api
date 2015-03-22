@@ -14,7 +14,7 @@ case class BitcoinAddress(override val value: String) extends Address(value)
 case class AssetAddress(override val value: String) extends Address(value)
 
 trait CoinprismBlockchainQuery { this: Environment =>
-  import system._
+  import coinprismSystem._
 
   /**
    * returns the balance of an address

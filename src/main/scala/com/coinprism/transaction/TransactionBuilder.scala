@@ -1,6 +1,7 @@
 package com.coinprism.transaction
 
-import com.coinprism.config.Environment
+import com.coinprism.config.{Formats, Environment}
+import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 
 import spray.client.pipelining._
 import spray.http.HttpRequest
@@ -8,18 +9,20 @@ import spray.httpx.SprayJsonSupport._
 import scala.concurrent.Future
 import spray.json._
 trait CoinprismTransactionBuilder { this: Environment =>
-  import system._
+  import coinprismSystem._
 
   /**
    * Creates an unsigned transaction for issuing colored coins from a bitcoin address.
    * The destination ('address' parameter) must be an asset enabled address.
    * @param unsigned transaction - the unsigned transaction
    */
-  def createUnsignedTxForColoredCoins(issuance: ColorCoinIssuance): Future[UnsignedTransaction] = {
+  def createUnsignedTxForColoredCoins(issuance: ColorCoinIssuance)(format : ApiFormats): Future[UnsignedTransaction] = {
     import ColorCoinIssuanceProtocol._
     import UnsignedTransactionProtocol._
+    val uri = host + version + issueAsset
+    val formattedUri = Formats.correctFormat(uri,format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post(host + version + issueAsset + "?format=json", issuance))
+    pipeline(Post(formattedUri, issuance))
 
   }
 
@@ -28,11 +31,13 @@ trait CoinprismTransactionBuilder { this: Environment =>
    * The destination ('address' parameter) must be an asset enabled address.
    * @param asset transaction - the asset transaction to be sent to coinprism
    */
-  def createUnsignedTxForAsset(assetTransaction: NewAssetTransaction): Future[UnsignedTransaction] = {
+  def createUnsignedTxForAsset(assetTransaction: NewAssetTransaction)(format : ApiFormats): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import NewAssetTransactionProtocol._
+    val uri = host + version + sendAsset
+    val formattedUri = Formats.correctFormat(uri, format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post(host + version + sendAsset + "?format=json", assetTransaction))
+    pipeline(Post( formattedUri, assetTransaction))
   }
 
   /**
@@ -40,11 +45,13 @@ trait CoinprismTransactionBuilder { this: Environment =>
    * @param bitcoinTransaction - the bitcoin transaction to be sent to coinprism
    * @return unsignedTransaction - the unsignedTransaction coinprism created
    */
-  def createUnsignedTxForBitcoin(bitcoinTransaction: NewBitcoinTransaction): Future[UnsignedTransaction] = {
+  def createUnsignedTxForBitcoin(bitcoinTransaction: NewBitcoinTransaction)(format : ApiFormats): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import NewBitcoinTransactionProtocol._
+    val uri = host + version + sendBitcoin
+    val formattedUri = Formats.correctFormat(uri,format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post(host + version + sendBitcoin + "?format=json", bitcoinTransaction))
+    pipeline(Post(formattedUri, bitcoinTransaction))
   }
 
   /**
@@ -53,11 +60,13 @@ trait CoinprismTransactionBuilder { this: Environment =>
    * the given amount of an asset coming from another address.
    * @return UnsignedTransaction reprsenting the swap
    */
-  def atomicallySwapBitcoinsAndAsset( swp : SwapBitcoinsAndAsset) : Future[UnsignedTransaction] = {
+  def atomicallySwapBitcoinsAndAsset( swp : SwapBitcoinsAndAsset)(format : ApiFormats) : Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import SwapBitcoinsAndAssetProtocol._
+    val uri =host + version + bitcoinAssetSwap
+    val formattedUri = Formats.correctFormat(uri, format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post(host + version + bitcoinAssetSwap + "?format=json", swp))
+    pipeline(Post(formattedUri, swp))
   }
 
   /**
@@ -73,4 +82,6 @@ trait CoinprismTransactionBuilder { this: Environment =>
     val pipeline: HttpRequest => Future[RawTransaction] = sendReceive ~> unmarshal[RawTransaction]
     pipeline(Post(host + version + signTransaction,unsignedTxWithPrivateKey))
   }
+
+
 }

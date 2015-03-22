@@ -8,10 +8,10 @@ import scala.language.postfixOps
 import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
 import scala.concurrent.Future
-import com.coinprism.config.Test
-import com.coinprism.config.Production
+import com.coinprism.config.CoinprismProduction
 
-class BlockchainQueryTest extends FlatSpec with MustMatchers with ScalaFutures with CoinprismBlockchainQuery with Production {
+class BlockchainQueryTest extends FlatSpec with MustMatchers
+with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
 
   val bitcoinAddress = BitcoinAddress("1BXVXP82f7x9YWdWuCaCYwad8ZoYayyRYt")
   val unusedAddress = BitcoinAddress("1suredbitsx9YWdWuCaCYwad8ZoYayyRYt")

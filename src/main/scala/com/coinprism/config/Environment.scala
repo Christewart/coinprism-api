@@ -15,13 +15,13 @@ trait Environment {
   def signTransaction = "signtransaction"
   def version = v1
 
-  implicit val system = ActorSystem("Coinprism-Api-Actor-System")
+  implicit val coinprismSystem = ActorSystem("Coinprism-Api-Actor-System")
 }
 
-trait Production extends Environment {
+trait CoinprismProduction extends Environment {
   override def host = "https://api.coinprism.com/"
 }
 
-trait Test extends Environment {
+trait CoinprismTest extends Environment {
   override def host = "https://private-anon-0d71c0e2f-coinprism.apiary-mock.com/"
 }
