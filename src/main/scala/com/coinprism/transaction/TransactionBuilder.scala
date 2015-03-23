@@ -78,9 +78,22 @@ trait CoinprismTransactionBuilder { this: CoinprismEnvironment =>
   def signTransaction(unsignedTxWithPrivateKey : UnsignedTxHexWithPrivateKey) : Future[RawTransaction] = {
     import UnsignedTxHexWithPrivateKeyProtocol._
     import RawTransactionProtocol._
-    println(unsignedTxWithPrivateKey.toJson)
+
     val pipeline: HttpRequest => Future[RawTransaction] = sendReceive ~> unmarshal[RawTransaction]
     pipeline(Post(host + version + signTransaction,unsignedTxWithPrivateKey))
+  }
+
+
+  /**
+   * Broadcasts the transaction to the bitcoin network
+   * @param tx - the hexadecimal representation for the transaction to be
+   * broadcasted
+   * @return the transaction hash
+   */
+  def broadcastTransaction(tx : String) : Future[TransactionHash] = {
+    import TransactionHashFormat._
+    val pipeline: HttpRequest => Future[TransactionHash] = sendReceive ~> unmarshal[TransactionHash]
+    pipeline(Post(host + version + sendrawtransaction, tx))
   }
 
 

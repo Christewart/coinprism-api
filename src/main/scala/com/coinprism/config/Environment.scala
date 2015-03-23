@@ -13,6 +13,7 @@ trait CoinprismEnvironment {
   def sendBitcoin = "sendbitcoin"
   def bitcoinAssetSwap = "bitcoinassetswap"
   def signTransaction = "signtransaction"
+  def sendrawtransaction = "sendrawtransaction"
   def version = v1
 
   implicit val coinprismSystem = ActorSystem("Coinprism-Api-Actor-System")
