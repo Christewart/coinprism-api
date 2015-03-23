@@ -2,7 +2,7 @@ package com.coinprism.config
 
 import akka.actor.ActorSystem
 
-trait Environment {
+trait CoinprismEnvironment {
   def host: String
   def v1 = "v1/"
   def addresses = "addresses/"
@@ -18,10 +18,10 @@ trait Environment {
   implicit val coinprismSystem = ActorSystem("Coinprism-Api-Actor-System")
 }
 
-trait CoinprismProduction extends Environment {
+trait CoinprismProduction extends CoinprismEnvironment {
   override def host = "https://api.coinprism.com/"
 }
 
-trait CoinprismTest extends Environment {
-  override def host = "https://private-anon-0d71c0e2f-coinprism.apiary-mock.com/"
+trait CoinprismTest extends CoinprismEnvironment {
+  override def host = "https://testnet.api.coinprism.com/"
 }

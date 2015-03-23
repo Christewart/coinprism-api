@@ -7,13 +7,13 @@ import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
 
 import spray.json.JsValue
-import com.coinprism.config.Environment
+import com.coinprism.config.{CoinprismEnvironment}
 
 abstract class Address(val value: String)
 case class BitcoinAddress(override val value: String) extends Address(value)
 case class AssetAddress(override val value: String) extends Address(value)
 
-trait CoinprismBlockchainQuery { this: Environment =>
+trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
   import coinprismSystem._
 
   /**

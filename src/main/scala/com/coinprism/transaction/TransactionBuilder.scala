@@ -1,6 +1,6 @@
 package com.coinprism.transaction
 
-import com.coinprism.config.{Formats, Environment}
+import com.coinprism.config.{CoinprismEnvironment, Formats}
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 
 import spray.client.pipelining._
@@ -8,7 +8,7 @@ import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
 import scala.concurrent.Future
 import spray.json._
-trait CoinprismTransactionBuilder { this: Environment =>
+trait CoinprismTransactionBuilder { this: CoinprismEnvironment =>
   import coinprismSystem._
 
   /**
