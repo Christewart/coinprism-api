@@ -92,7 +92,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
    * broadcasted
    * @return the transaction hash
    */
-  def broadcastTransaction(tx : String) : Future[Either[TransactionHash, Map[String,JsValue]]] = {
+  def broadcastRawTransaction(tx : String) : Future[Either[TransactionHash, Map[String,JsValue]]] = {
     val pipeline = sendReceive
     val msg: String = "\"" + tx + "\""
     val request = Post(host + version + sendrawtransaction, HttpEntity(ContentTypes.`application/json`, msg))

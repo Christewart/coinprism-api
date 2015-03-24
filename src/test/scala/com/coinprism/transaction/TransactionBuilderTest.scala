@@ -99,7 +99,7 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
       "f60a3f10358327e88ac306f" +
       "0100000000001976a914760fdb3483204406ddb73a45b20b7c9be61d0a7e88ac00000000"
 
-    val response = broadcastTransaction(rawTx)
+    val response = broadcastRawTransaction(rawTx)
     response onComplete {
       case Success(h) => println(h)
       case Failure(err) => throw err
