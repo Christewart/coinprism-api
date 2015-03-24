@@ -4,11 +4,14 @@ import com.coinprism.config.{CoinprismEnvironment, Formats}
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 
 import spray.client.pipelining._
-import spray.http.HttpRequest
+import spray.http._
+import spray.httpx.SprayJsonSupport
 import spray.httpx.SprayJsonSupport._
 import scala.concurrent.Future
 import spray.json._
-trait CoinprismTransactionBuilder { this: CoinprismEnvironment =>
+import spray.json.AdditionalFormats
+
+trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormats { this: CoinprismEnvironment =>
   import coinprismSystem._
 
   /**
@@ -83,18 +86,24 @@ trait CoinprismTransactionBuilder { this: CoinprismEnvironment =>
     pipeline(Post(host + version + signTransaction,unsignedTxWithPrivateKey))
   }
 
-
   /**
    * Broadcasts the transaction to the bitcoin network
    * @param tx - the hexadecimal representation for the transaction to be
    * broadcasted
    * @return the transaction hash
    */
-  def broadcastTransaction(tx : String) : Future[TransactionHash] = {
-    import TransactionHashFormat._
-    val pipeline: HttpRequest => Future[TransactionHash] = sendReceive ~> unmarshal[TransactionHash]
-    pipeline(Post(host + version + sendrawtransaction, tx))
+  def broadcastTransaction(tx : String) : Future[Either[TransactionHash, Map[String,JsValue]]] = {
+    val pipeline = sendReceive
+    val msg: String = "\"" + tx + "\""
+    val request = Post(host + version + sendrawtransaction, HttpEntity(ContentTypes.`application/json`, msg))
+
+    val response =  pipeline(request) // receive result as Future[HttpResponse]
+    import spray.json._
+    for { res <- response } yield {
+      res.entity.asString(HttpCharsets.`UTF-8`).parseJson match {
+        case JsString(string) => Left(TransactionHash(string))
+        case JsObject(obj) => Right(obj)
+      }
+    }
   }
-
-
 }
