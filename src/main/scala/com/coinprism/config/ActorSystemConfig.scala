@@ -6,6 +6,12 @@ import akka.actor.ActorSystem
 trait ActorSystemConfig {
 
   implicit val timeout = Timeout(5 seconds)
-  lazy val actorSystem = ActorSystem("Coinprism-api")
+  lazy val actorSystem = CoinprismActorSystemConfig.actorSystem
   
+}
+
+
+object CoinprismActorSystemConfig {
+  lazy val actorSystem = ActorSystem("Coinprism-api")
+
 }

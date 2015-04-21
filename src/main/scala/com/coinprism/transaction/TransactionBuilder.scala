@@ -97,7 +97,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
     val msg: String = "\"" + tx + "\""
     val request = Post(host + version + sendrawtransaction, HttpEntity(ContentTypes.`application/json`, msg))
 
-    val response =  pipeline(request) // receive result as Future[HttpResponse]
+    val response : Future[HttpResponse] =  pipeline(request)
     import spray.json._
     for { res <- response } yield {
       res.entity.asString(HttpCharsets.`UTF-8`).parseJson match {
