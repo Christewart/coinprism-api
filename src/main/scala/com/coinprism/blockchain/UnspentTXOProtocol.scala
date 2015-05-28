@@ -26,9 +26,8 @@ object UnspentTXOProtocol extends DefaultJsonProtocol {
         jsObject.getFields("transaction_hash", "output_index", "value", "addresses",
           "script_hex", "spent")
 
-      println("Asset Id: " + jsObject.fields.get("asset_id"))
       val assetId = jsObject.fields.get("asset_id") match {
-        case Some(JsString(s)) => println("Match JsString : " + s); Some(s)
+        case Some(JsString(s)) => Some(s)
         case None => None
         //fix for a bug where we can have the case Some(null) but apparently cannot match explicitly on it
         case _ => None
