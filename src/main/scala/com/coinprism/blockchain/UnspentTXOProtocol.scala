@@ -10,7 +10,6 @@ import spray.json.JsArray
 import spray.json.JsNumber
 import spray.json.JsBoolean
 import spray.json.JsNull
-import com.coinprism.blockchain.BitcoinAddressProtocol.bitcoinAddressFormat
 
 case class UnspentTXO(transaction_hash: String, output_index: Int, value: Long,
   asset_id: Option[String], asset_quantity: Option[Long], addresses: List[BitcoinAddress],
@@ -27,14 +26,19 @@ object UnspentTXOProtocol extends DefaultJsonProtocol {
         jsObject.getFields("transaction_hash", "output_index", "value", "addresses",
           "script_hex", "spent")
 
+      println("Asset Id: " + jsObject.fields.get("asset_id"))
       val assetId = jsObject.fields.get("asset_id") match {
-        case Some(JsString(s)) => Some(s)
+        case Some(JsString(s)) => println("Match JsString : " + s); Some(s)
         case None => None
+        //fix for a bug where we can have the case Some(null) but apparently cannot match explicitly on it
+        case _ => None
       }
 
       val assetQuantity = jsObject.fields.get("asset_quantity") match {
         case Some(JsNumber(n)) => Some(n.toLong)
         case None => None
+        //fix for a bug where we can have the case Some(null) but apparently cannot match explicitly on it
+        case _ => None
       }
 
       // convert JsArray to List[ BitcoinAdress ]

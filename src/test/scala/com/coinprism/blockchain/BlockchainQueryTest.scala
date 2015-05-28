@@ -9,6 +9,7 @@ import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
 import scala.concurrent.Future
 import com.coinprism.config.CoinprismProduction
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BlockchainQueryTest extends FlatSpec with MustMatchers
 with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
@@ -107,5 +108,19 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
       Await.result(response, 2 seconds)
     } must produce[UnsuccessfulResponseException]
 
+  }
+
+  it must "return utxos for bitcoin addresses that have no associated asset information correctly" in  {
+    val bitcoinAddress = BitcoinAddress("1C4kYhyLftmkn48YarSoLupxHfYFo8kp64")
+    val utxos : Future[List[UnspentTXO]] = unspentTXOs(bitcoinAddress)
+    utxos onFailure { case err =>
+        err.printStackTrace
+
+    }
+    whenReady(utxos, timeout(5 seconds), interval( 5 millis)) { utxo =>
+      utxo.size must be (1)
+
+
+    }
   }
 }
