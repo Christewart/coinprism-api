@@ -3,7 +3,7 @@ package com.coinprism.config
 import akka.actor.ActorSystem
 
 trait CoinprismEnvironment {
-  def host: String
+  def host : String
   def v1 = "v1/"
   def addresses = "addresses/"
   def transactions = "transactions/"
@@ -16,6 +16,7 @@ trait CoinprismEnvironment {
   def sendrawtransaction = "sendrawtransaction"
   def version = v1
 
+  def url = host + version
   implicit val coinprismSystem = ActorSystem("Coinprism-Api-Actor-System")
 }
 

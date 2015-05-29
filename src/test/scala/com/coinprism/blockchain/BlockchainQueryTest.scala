@@ -8,7 +8,7 @@ import scala.language.postfixOps
 import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
 import scala.concurrent.Future
-import com.coinprism.config.CoinprismProduction
+import com.coinprism.config.{Formats, CoinprismProduction}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class BlockchainQueryTest extends FlatSpec with MustMatchers
@@ -62,6 +62,29 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
     }
   }
 
+  it must "return the specified raw transaction for a given hash" in {
+    val tx: Future[Tx] = transaction("fbb36255453bf8ff465d9ca5c427bd0e36cc799fda090cbcd62113f1f3e97cb4")(Formats.Raw)
+
+    whenReady(tx, timeout(2 seconds), interval(5 millis)) { t =>
+
+      val serializedTx = t match {
+
+        case RawTransaction(tx) => tx
+        case _ => throw new RuntimeException("This should not happen")
+      }
+
+
+      serializedTx must be("010000000251fe802030b47de4446515845a301a30f766ae6ec35eb36f20a926d494c0b1b3000000008" +
+        "a4730440220097e576cde74ea5846270de7cbeab7092b81677f8f09ebd688503bf7bc2f2ccc02200e7b94c28b2900e9319a1f5a" +
+        "866389d6b60133893c3f3076ea3873e4bfa676ae014104b571b629acf60e5cc2172312300ca4430f41eed8abd6f63f7f56faf89" +
+        "c0cf973fe442ee0e8a4bce43b2f4c579360aeb0815029c38386ebd74ebef41abb8e7a64ffffffffe8c910f11f69e68360bb7f9f" +
+        "e6e6d905d8097ba3b9c8a68819a2d9340657d112010000008c493046022100daf02064b803c403a9ef2d981667dbd53df427e79" +
+        "9f78f59f2627db9689b1272022100d4ee9808cae4eefc6e65c0bc6b88a371a9e88f730f0f2691c5ac945b9f3706a0014104a0df" +
+        "3cdda29a8062483e6fd472958e05c0ea8d439591be97d1d230095ae264f293be19f35500e934faae5c0ad2a780d1c98018898a" +
+        "56f34bdcf729e7332aa824ffffffff0280841e00000000001976a914795efb808598d6a24d1734b929fce1d4b713215188ac72c" +
+        "a3400000000001976a914a05c4efe25b472dbb07d04e6c8a6b3197d8bdcdb88ac00000000")
+    }
+  }
   it must "return the correct amount of inputs for a transaction given an address" in {
     val transactions: Future[List[Transaction]] = recentTransactions(bitcoinAddress)
     whenReady(transactions, timeout(2 seconds), interval(5 millis)) { txs =>
