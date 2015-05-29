@@ -1,20 +1,18 @@
 package com.coinprism.blockchain
 
+import com.coinprism.transaction.Transaction
 import spray.json.DefaultJsonProtocol
 import org.joda.time.DateTime
 import spray.json.RootJsonFormat
 import spray.json.JsValue
 import spray.json.JsString
 
-sealed trait Tx
-case class Transaction(hash: String, block_hash: String, block_height: Long, block_time: DateTime,
-  inputs: List[Input], outputs: List[Output], amount: Long, fees: Long, confirmations: Long) extends Tx
-case class RawTransaction( raw : String) extends Tx
+
+
 
 object DateTimeProtocol extends DefaultJsonProtocol {
 
   implicit object DateTimeFormat extends RootJsonFormat[DateTime] {
-
     override def read(value: JsValue) = {
       value match {
         case JsString(s) => DateTime.parse(s)
@@ -33,9 +31,5 @@ object TransactionProtocol extends DefaultJsonProtocol {
   import DateTimeProtocol._
 
   implicit val transactionProtocol = jsonFormat9(Transaction.apply)
-}
-
-object RawTransactionProtocol extends DefaultJsonProtocol {
-  implicit val rawTransactionProtocol = jsonFormat1(RawTransaction.apply)
 }
 

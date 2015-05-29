@@ -1,5 +1,6 @@
 package com.coinprism.transaction
 
+
 import com.coinprism.config.{CoinprismEnvironment, Formats}
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 

@@ -9,6 +9,7 @@ import scala.concurrent.duration.DurationInt
 import spray.httpx.UnsuccessfulResponseException
 import scala.concurrent.Future
 import com.coinprism.config.{Formats, CoinprismProduction}
+import com.coinprism.transaction. { RawTransaction, Transaction, Tx }
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class BlockchainQueryTest extends FlatSpec with MustMatchers

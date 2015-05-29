@@ -2,7 +2,7 @@ package com.coinprism.blockchain
 
 
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
-
+import com.coinprism.transaction.{ Transaction , RawTransaction, Tx }
 import scala.concurrent.Future
 import spray.client.pipelining._
 import spray.http.HttpRequest
@@ -63,7 +63,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
    */
   def transaction(transaction_hash: String)(format : ApiFormats): Future[Tx] = {
     import TransactionProtocol._
-    import RawTransactionProtocol._
+    import com.coinprism.transaction.RawTransactionProtocol._
     val uri = url + "transactions/" + transaction_hash
     val formattedUri = Formats.correctFormat(uri,format)
     val pipeline: HttpRequest => Future[Tx] = format match {
