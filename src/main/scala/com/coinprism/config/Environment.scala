@@ -15,9 +15,9 @@ trait CoinprismEnvironment {
   def signTransaction = "signtransaction"
   def sendrawtransaction = "sendrawtransaction"
   def version = v1
-
   def url = host + version
   implicit val coinprismSystem = ActorSystem("Coinprism-Api-Actor-System")
+
 }
 
 trait CoinprismProduction extends CoinprismEnvironment {

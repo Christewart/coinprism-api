@@ -3,11 +3,11 @@ package com.coinprism.blockchain
 
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 import com.coinprism.transaction.{ Transaction , RawTransaction, Tx }
+import org.slf4j.LoggerFactory
 import scala.concurrent.Future
 import spray.client.pipelining._
 import spray.http.HttpRequest
 import spray.httpx.SprayJsonSupport._
-
 import spray.json.JsValue
 import com.coinprism.config.{Formats, CoinprismEnvironment}
 
@@ -18,12 +18,14 @@ case class AssetAddress(override val value: String) extends Address(value)
 trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
   import coinprismSystem._
 
+  private lazy val logger = LoggerFactory.getLogger(this.getClass)
   /**
    * returns the balance of an address
    * @param address - the address to fetch from coinprism
    * @return balance - the balance of this address
    */
   def addressBalance(address: Address): Future[AddressBalance] = {
+    logger.debug("============================================================================")
     import AssetBalanceProtocol._
     import AddressBalanceProtocol._
     val pipeline: HttpRequest => Future[AddressBalance] =
@@ -66,6 +68,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
     import com.coinprism.transaction.RawTransactionProtocol._
     val uri = url + "transactions/" + transaction_hash
     val formattedUri = Formats.correctFormat(uri,format)
+    logger.debug("Full request: " + formattedUri)
     val pipeline: HttpRequest => Future[Tx] = format match {
       case Json => sendReceive ~> unmarshal[Transaction]
       case Raw => sendReceive ~> unmarshal[RawTransaction]

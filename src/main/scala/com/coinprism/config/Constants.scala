@@ -1,2 +1,0 @@
-package com.coinprism.config
-

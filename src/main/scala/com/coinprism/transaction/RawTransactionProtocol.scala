@@ -9,9 +9,12 @@ import spray.json.DefaultJsonProtocol
  */
 
 sealed abstract class Tx
+
 case class Transaction(hash: String, block_hash: String, block_height: Long, block_time: DateTime,
-                       inputs: List[Input], outputs: List[Output], amount: Long, fees: Long, confirmations: Long) extends Tx
+  inputs: List[Input], outputs: List[Output], amount: Long, fees: Long, confirmations: Long) extends Tx
+
 case class RawTransaction(raw : String) extends Tx
+
 object RawTransactionProtocol extends DefaultJsonProtocol {
-implicit val rawTransactionFormat = jsonFormat(RawTransaction, "raw")
+  implicit val rawTransactionFormat = jsonFormat(RawTransaction, "raw")
 }

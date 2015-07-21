@@ -107,6 +107,13 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
     }
   }
 
+  it must "return no utxos for an address whose utxos have been spent" in {
+    val response : Future[List[UnspentTXO]] = unspentTXOs(BitcoinAddress("1HuTJL3F8vdSpTmSjVEQLoB65bCDbXJC6y"))
+    whenReady(response, timeout(5 seconds), interval(5 millis)) { utxos =>
+      utxos.size must be (0)
+    }
+  }
+
   it must "return the address that own an asset" in {
 
     val ownership = assetOwners(assetId)
