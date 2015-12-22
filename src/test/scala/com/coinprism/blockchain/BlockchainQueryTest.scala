@@ -1,5 +1,6 @@
 package com.coinprism.blockchain
 
+import org.scalacoin.protocol.{AssetAddress, BitcoinAddress}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.FlatSpec
 import org.scalatest.MustMatchers
@@ -108,7 +109,7 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
   }
 
   it must "return no utxos for an address whose utxos have been spent" in {
-    val response : Future[List[UnspentTXO]] = unspentTXOs(BitcoinAddress("1HuTJL3F8vdSpTmSjVEQLoB65bCDbXJC6y"))
+    val response : Future[List[UnspentTXO]] = unspentTXOs(BitcoinAddress("1CMwVSZxWNcbzqbwSMmNif8jentYpTxHm"))
     whenReady(response, timeout(5 seconds), interval(5 millis)) { utxos =>
       utxos.size must be (0)
     }
@@ -142,7 +143,7 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
   }
 
   it must "return utxos for bitcoin addresses that have no associated asset information correctly" in  {
-    val bitcoinAddress = BitcoinAddress("1C4kYhyLftmkn48YarSoLupxHfYFo8kp64")
+    val bitcoinAddress = BitcoinAddress("1E1fVCSPwfQggtPpQL4K8uKCxeELTyj13U")
     val utxos : Future[List[UnspentTXO]] = unspentTXOs(bitcoinAddress)
     utxos onFailure { case err =>
         err.printStackTrace
@@ -150,8 +151,6 @@ with ScalaFutures with CoinprismBlockchainQuery with CoinprismProduction {
     }
     whenReady(utxos, timeout(5 seconds), interval( 5 millis)) { utxo =>
       utxo.size must be (1)
-
-
     }
   }
 }

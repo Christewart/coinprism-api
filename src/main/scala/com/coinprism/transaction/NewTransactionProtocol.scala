@@ -1,7 +1,8 @@
 package com.coinprism.transaction
 
 
-import com.coinprism.blockchain.{AssetAddress, BitcoinAddress, BitcoinAddressProtocol}
+import com.coinprism.blockchain.{BitcoinAddressProtocol}
+import org.scalacoin.protocol.{AssetAddress, BitcoinAddress}
 import spray.json.{JsValue, JsObject, DefaultJsonProtocol, RootJsonFormat, JsNumber, JsString,
 JsArray}
 

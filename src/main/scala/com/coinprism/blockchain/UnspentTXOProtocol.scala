@@ -1,5 +1,6 @@
 package com.coinprism.blockchain
 
+import org.scalacoin.protocol.BitcoinAddress
 import spray.json.DefaultJsonProtocol
 import spray.json.JsObject
 import spray.json.JsString
@@ -57,7 +58,8 @@ object UnspentTXOProtocol extends DefaultJsonProtocol {
       val addresses = unspentTXO.addresses.map(p =>
         bitcoinAddressFormat.write(p))(breakOut): Vector[JsValue]
 
-      val m: Map[String, JsValue] = Map("transaction_hash" -> JsString(unspentTXO.transaction_hash),
+      val m: Map[String, JsValue] = Map(
+        "transaction_hash" -> JsString(unspentTXO.transaction_hash),
         "output_index" -> JsString(unspentTXO.output_index.toString),
         "value" -> JsString(unspentTXO.value.toString),
         "asset_id" -> (unspentTXO.asset_id match {

@@ -23,7 +23,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
   def createUnsignedTxForColoredCoins(issuance: ColorCoinIssuance)(format : ApiFormats): Future[UnsignedTransaction] = {
     import ColorCoinIssuanceProtocol._
     import UnsignedTransactionProtocol._
-    val uri = url + issueAsset
+    val uri = coinprismUrl + issueAsset
     val formattedUri = Formats.correctFormat(uri,format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
     pipeline(Post(formattedUri, issuance))
@@ -38,10 +38,10 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
   def createUnsignedTxForAsset(assetTransaction: NewAssetTransaction)(format : ApiFormats): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import NewAssetTransactionProtocol._
-    val uri = url + sendAsset
+    val uri = coinprismUrl + sendAsset
     val formattedUri = Formats.correctFormat(uri, format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
-    pipeline(Post( formattedUri, assetTransaction))
+    pipeline(Post(formattedUri, assetTransaction))
   }
 
   /**
@@ -52,7 +52,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
   def createUnsignedTxForBitcoin(bitcoinTransaction: NewBitcoinTransaction)(format : ApiFormats): Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import NewBitcoinTransactionProtocol._
-    val uri = url + sendBitcoin
+    val uri = coinprismUrl + sendBitcoin
     val formattedUri = Formats.correctFormat(uri,format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
     pipeline(Post(formattedUri, bitcoinTransaction))
@@ -67,7 +67,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
   def atomicallySwapBitcoinsAndAsset( swp : SwapBitcoinsAndAsset)(format : ApiFormats) : Future[UnsignedTransaction] = {
     import UnsignedTransactionProtocol._
     import SwapBitcoinsAndAssetProtocol._
-    val uri = url + bitcoinAssetSwap
+    val uri = coinprismUrl + bitcoinAssetSwap
     val formattedUri = Formats.correctFormat(uri, format)
     val pipeline: HttpRequest => Future[UnsignedTransaction] = sendReceive ~> unmarshal[UnsignedTransaction]
     pipeline(Post(formattedUri, swp))
@@ -84,7 +84,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
     import RawTransactionProtocol._
 
     val pipeline: HttpRequest => Future[RawTransaction] = sendReceive ~> unmarshal[RawTransaction]
-    pipeline(Post(url + signTransaction,unsignedTxWithPrivateKey))
+    pipeline(Post(coinprismUrl + signTransaction,unsignedTxWithPrivateKey))
   }
 
   /**
@@ -96,7 +96,7 @@ trait CoinprismTransactionBuilder extends SprayJsonSupport with AdditionalFormat
   def broadcastRawTransaction(tx : String) : Future[Either[TransactionHash, Map[String,JsValue]]] = {
     val pipeline = sendReceive
     val msg: String = "\"" + tx + "\""
-    val request = Post(url +  sendrawtransaction, HttpEntity(ContentTypes.`application/json`, msg))
+    val request = Post(coinprismUrl +  sendrawtransaction, HttpEntity(ContentTypes.`application/json`, msg))
 
     val response : Future[HttpResponse] =  pipeline(request)
     import spray.json._

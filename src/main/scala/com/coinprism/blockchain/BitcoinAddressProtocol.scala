@@ -1,13 +1,15 @@
 package com.coinprism.blockchain
 
+import org.scalacoin.protocol.{AssetAddress, Address, BitcoinAddress}
 import spray.json.DefaultJsonProtocol
 import spray.json.JsString
 import spray.json.JsValue
 import spray.json.RootJsonFormat
 import spray.json.JsObject
+
 object BitcoinAddressProtocol extends DefaultJsonProtocol {
 
-  implicit val bitcoinAddressFormat = jsonFormat(BitcoinAddress, "value")
+  implicit val bitcoinAddressFormat = jsonFormat1(BitcoinAddress.apply _)
 
 }
 

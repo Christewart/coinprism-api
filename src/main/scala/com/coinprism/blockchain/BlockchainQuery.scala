@@ -3,6 +3,7 @@ package com.coinprism.blockchain
 
 import com.coinprism.config.Formats.{Raw, Json, ApiFormats}
 import com.coinprism.transaction.{ Transaction , RawTransaction, Tx }
+import org.scalacoin.protocol.Address
 import org.slf4j.LoggerFactory
 import scala.concurrent.Future
 import spray.client.pipelining._
@@ -11,9 +12,6 @@ import spray.httpx.SprayJsonSupport._
 import spray.json.JsValue
 import com.coinprism.config.{Formats, CoinprismEnvironment}
 
-abstract class Address(val value: String)
-case class BitcoinAddress(override val value: String) extends Address(value)
-case class AssetAddress(override val value: String) extends Address(value)
 
 trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
   import coinprismSystem._
@@ -25,14 +23,13 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
    * @return balance - the balance of this address
    */
   def addressBalance(address: Address): Future[AddressBalance] = {
-    logger.debug("============================================================================")
     import AssetBalanceProtocol._
     import AddressBalanceProtocol._
     val pipeline: HttpRequest => Future[AddressBalance] =
       addHeader("Authorization",
         "2179cc484e71fcaf682bbe3a95364210c02495b57940949dcb83df26306d0ebb") ~>
       sendReceive ~> unmarshal[AddressBalance]
-    pipeline(Get(url +  addresses + address.value))
+    pipeline(Get(coinprismUrl +  addresses + address.value))
   }
 
   /**
@@ -44,7 +41,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
     import TransactionProtocol._
     val pipeline: HttpRequest => Future[List[Transaction]] =
       sendReceive ~> unmarshal[List[Transaction]]
-    pipeline(Get(url + addresses + address.value + "/transactions?format=json"))
+    pipeline(Get(coinprismUrl + addresses + address.value + "/transactions?format=json"))
   }
   /**
    * Finds all the unspent transaction outputs of an address
@@ -55,7 +52,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
     import UnspentTXOProtocol._
     val pipeline: HttpRequest => Future[List[UnspentTXO]] =
       sendReceive ~> unmarshal[List[UnspentTXO]]
-    pipeline(Get(url + addresses + address.value + "/unspents"))
+    pipeline(Get(coinprismUrl + addresses + address.value + "/unspents"))
   }
 
   /**
@@ -66,7 +63,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
   def transaction(transaction_hash: String)(format : ApiFormats): Future[Tx] = {
     import TransactionProtocol._
     import com.coinprism.transaction.RawTransactionProtocol._
-    val uri = url + "transactions/" + transaction_hash
+    val uri = coinprismUrl + "transactions/" + transaction_hash
     val formattedUri = Formats.correctFormat(uri,format)
     logger.debug("Full request: " + formattedUri)
     val pipeline: HttpRequest => Future[Tx] = format match {
@@ -84,7 +81,7 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
   def assetDefinition(assetId: String): Future[AssetMetaInfo] = {
     import AssetMetaInfoProtocol._
     val pipeline: HttpRequest => Future[AssetMetaInfo] = sendReceive ~> unmarshal[AssetMetaInfo]
-    pipeline(Get(url+ assets + assetId))
+    pipeline(Get(coinprismUrl+ assets + assetId))
   }
 
   /**
@@ -96,8 +93,8 @@ trait CoinprismBlockchainQuery { this: CoinprismEnvironment =>
     import AssetOwnershipProtocol._
     val pipeline: HttpRequest => Future[AssetOwnership] = sendReceive ~> unmarshal[AssetOwnership]
     blockHeight match {
-      case Some(n) => pipeline(Get(url + assets + assetId + "/owners?block=" + blockHeight.toString))
-      case None => pipeline(Get(url + assets + assetId + "/owners"))
+      case Some(n) => pipeline(Get(coinprismUrl + assets + assetId + "/owners?block=" + blockHeight.toString))
+      case None => pipeline(Get(coinprismUrl + assets + assetId + "/owners"))
     }
   }
 

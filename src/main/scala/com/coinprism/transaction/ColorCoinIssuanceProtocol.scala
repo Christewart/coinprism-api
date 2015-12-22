@@ -1,9 +1,9 @@
 package com.coinprism.transaction
 
+import org.scalacoin.protocol.{AssetAddress, BitcoinAddress}
 import spray.json._
-import com.coinprism.blockchain.BitcoinAddress
+
 import com.coinprism.blockchain.BitcoinAddressProtocol
-import com.coinprism.blockchain.AssetAddress
 import com.coinprism.blockchain.AssetAddressProtocol
 case class ColorCoinIssuance(fees: Long, from: BitcoinAddress, address: AssetAddress,
   amount: Long, metadata: String)

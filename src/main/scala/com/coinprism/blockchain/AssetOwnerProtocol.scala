@@ -1,5 +1,6 @@
 package com.coinprism.blockchain
 
+import org.scalacoin.protocol.BitcoinAddress
 import spray.json.DefaultJsonProtocol
 import spray.json.JsValue
 import spray.json.RootJsonFormat

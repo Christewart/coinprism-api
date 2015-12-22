@@ -1,6 +1,7 @@
 package com.coinprism.transaction
 
-import com.coinprism.blockchain.BitcoinAddress
+
+import org.scalacoin.protocol.BitcoinAddress
 import spray.json._
 import com.coinprism.blockchain.BitcoinAddressProtocol
 

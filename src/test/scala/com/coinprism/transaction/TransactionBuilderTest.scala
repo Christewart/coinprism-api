@@ -1,8 +1,9 @@
 package com.coinprism.transaction
 
-import com.coinprism.blockchain.{AssetAddress, BitcoinAddress}
+
 import com.coinprism.config.CoinprismProduction
 import com.coinprism.config.Formats.{ Json , Raw}
+import org.scalacoin.protocol.{AssetAddress, BitcoinAddress}
 import org.scalatest.{FlatSpec, MustMatchers}
 import org.scalatest.concurrent.ScalaFutures
 
@@ -21,7 +22,7 @@ class TransactionBuilderTest extends FlatSpec with MustMatchers with ScalaFuture
       AssetAddress("akSjSW57xhGp86K6JFXXroACfRCw7SPv637"), 500, "u=https://site.com/assetdef")
     val unsignedTransaction = createUnsignedTxForColoredCoins(coloredCoinIssuance)(Json)
 
-    whenReady(unsignedTransaction, timeout(3 seconds), interval(5 millis)) { txs =>
+    whenReady(unsignedTransaction, timeout(5 seconds), interval(5 millis)) { txs =>
       txs.inputs.get.size must be(1)
       txs.outputs.get.size must be(3)
       txs.amount.get must be (140756317)

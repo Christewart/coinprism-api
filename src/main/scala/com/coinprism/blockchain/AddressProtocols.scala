@@ -1,5 +1,6 @@
 package com.coinprism.blockchain
 
+import org.scalacoin.protocol.{BitcoinAddress, AssetAddress}
 import spray.json.DefaultJsonProtocol
 import spray.json.JsObject
 import spray.json.JsArray
@@ -18,6 +19,7 @@ case class AddressBalance(asset_address: AssetAddress, bitcoin_address: BitcoinA
 object AssetBalanceProtocol extends DefaultJsonProtocol {
   implicit val assetBalanceFormat = jsonFormat3(AssetBalance)
   implicit object AssetBalanceFormat extends RootJsonFormat[AssetBalance] {
+
     override def read(value: JsValue): AssetBalance = {
 
       val Seq(id, balance, unconfirmed_balance) =

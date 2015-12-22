@@ -1,7 +1,7 @@
 package com.coinprism.transaction
 
+import org.scalacoin.protocol.BitcoinAddress
 import spray.json._
-import com.coinprism.blockchain.BitcoinAddress
 import com.coinprism.blockchain.BitcoinAddressProtocol
 
 case class BitcoinDestination(address : BitcoinAddress, amount : Long)
